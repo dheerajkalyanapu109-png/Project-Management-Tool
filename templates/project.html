@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block content %}
+<h1>{{ project.name }}</h1><p class="muted">{{ project.description }}</p>
+<div class="row wrap">
+ <form method="post" action="{% url 'task_create' project.id %}" class="row wrap">{% csrf_token %}
+  <input name="title" placeholder="New task" required aria-label="Task title">
+  <select name="assignee" aria-label="Assign to"><option value="">Unassigned</option>{% for m in members %}<option value="{{ m.id }}">@{{ m.username }}</option>{% endfor %}</select>
+  <button>Add task</button></form>
+ <form method="post" action="{% url 'member_add' project.id %}" class="row wrap">{% csrf_token %}
+  <input name="username" placeholder="Add member by username" required aria-label="Username"><button class="ghost">Add member</button></form>
+</div>
+<p class="muted">Members: {% for m in members %}@{{ m.username }}{% if not forloop.last %}, {% endif %}{% endfor %} · <span class="live-dot">live</span></p>
+<div id="live" data-project="{{ project.id }}"><div class="board">
+{% for col in columns %}<section class="col"><h2>{{ col.label }} <span class="count">{{ col.tasks|length }}</span></h2>
+ {% for t in col.tasks %}<article class="tcard"><a href="{% url 'task_detail' t.id %}"><b>{{ t.title }}</b></a>
+  <p class="muted">{% if t.assignee %}@{{ t.assignee.username }}{% else %}Unassigned{% endif %} · 💬 {{ t.n_comments }}</p>
+  <div class="row">
+  {% if t.prev %}<form method="post" action="{% url 'task_update' t.id %}">{% csrf_token %}<input type="hidden" name="status" value="{{ t.prev }}"><input type="hidden" name="next" value="board"><button class="ghost" aria-label="Move back">←</button></form>{% endif %}
+  {% if t.next %}<form method="post" action="{% url 'task_update' t.id %}">{% csrf_token %}<input type="hidden" name="status" value="{{ t.next }}"><input type="hidden" name="next" value="board"><button class="ghost" aria-label="Move forward">→</button></form>{% endif %}
+  </div></article>
+ {% empty %}<p class="muted">Empty</p>{% endfor %}</section>{% endfor %}
+</div></div>{% endblock %}

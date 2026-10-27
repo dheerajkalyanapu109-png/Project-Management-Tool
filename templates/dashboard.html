@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block content %}
+<h1>Your projects</h1>
+<form method="post" action="{% url 'project_create' %}" class="row wrap">{% csrf_token %}
+ <input name="name" placeholder="New project name" required aria-label="Project name">
+ <input name="description" placeholder="Short description (optional)" aria-label="Description">
+ <button>Create project</button></form>
+<div class="grid">
+{% for p in projects %}<a class="pcard" href="{% url 'project_detail' p.id %}"><h2>{{ p.name }}</h2><p class="muted">{{ p.description|default:"No description" }}</p>
+ <p class="muted">{{ p.n_tasks }} task{{ p.n_tasks|pluralize }} · {{ p.members.count }} member{{ p.members.count|pluralize }}</p></a>
+{% empty %}<p class="muted">No projects yet. Create one above.</p>{% endfor %}
+</div>{% endblock %}

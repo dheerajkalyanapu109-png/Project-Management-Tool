@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block content %}
+<h1>Notifications</h1>
+{% for n in items %}<p class="note"><a href="{{ n.url|default:'#' }}">{{ n.text }}</a> <span class="muted">{{ n.created|timesince }} ago</span></p>
+{% empty %}<p class="muted">Nothing yet.</p>{% endfor %}{% endblock %}

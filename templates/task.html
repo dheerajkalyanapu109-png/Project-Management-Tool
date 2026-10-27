@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block content %}
+<p><a href="{% url 'project_detail' project.id %}">← {{ project.name }}</a></p>
+<h1>{{ task.title }}</h1>
+<form method="post" action="{% url 'task_update' task.id %}" class="row wrap">{% csrf_token %}
+ <label>Status <select name="status">{% for code, label in statuses %}<option value="{{ code }}" {% if task.status == code %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+ <label>Assignee <select name="assignee"><option value="">Unassigned</option>{% for m in members %}<option value="{{ m.id }}" {% if task.assignee_id == m.id %}selected{% endif %}>@{{ m.username }}</option>{% endfor %}</select></label>
+ <button>Save</button></form>
+<h2>Comments</h2>
+<div id="live" data-project="{{ project.id }}">
+{% for c in comments %}<div class="comment"><p class="muted"><b>@{{ c.author.username }}</b> · {{ c.created|timesince }} ago</p><p>{{ c.text|linebreaksbr }}</p></div>
+{% empty %}<p class="muted">No comments yet.</p>{% endfor %}</div>
+<form method="post" action="{% url 'comment_add' task.id %}" class="compose">{% csrf_token %}
+ <textarea name="text" rows="3" placeholder="Write a comment" aria-label="Comment" required></textarea><button>Comment</button></form>
+{% endblock %}
